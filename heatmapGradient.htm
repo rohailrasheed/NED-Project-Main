@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heatmap Layer</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlsIKkAP3ulARsjhf9NxA5ZTfJqFEp5W4&libraries=visualization"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 11,
+                center: { lat: 24.8607, lng: 67.0011 }, // Centered on Karachi
+                mapTypeId: 'roadmap',
+            });
+
+            const heatmapData = [];
+            const centerLat = 24.8607;
+            const centerLng = 67.0011;
+
+            // Generating excessive data points randomly clustered
+            for (let i = 0; i < 1000; i++) {
+                const latOffset = (Math.random() - 0.5) * 0.01; // Random offset
+                const lngOffset = (Math.random() - 0.5) * 0.01; // Random offset
+                const lat = centerLat + latOffset;
+                const lng = centerLng + lngOffset;
+                const weight = Math.random() * 5; // Random weight between 0 and 5
+                heatmapData.push({ location: new google.maps.LatLng(lat, lng), weight: weight });
+            }
+
+            const heatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatmapData,
+                map: map,
+            });
+
+            heatmap.set('radius', 20); // Larger radius to cover close points
+            heatmap.set('opacity', 0.6);
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>
