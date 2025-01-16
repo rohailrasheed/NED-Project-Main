@@ -19,7 +19,9 @@ jobs:
         run: |
           # Your ML workflow goes here
           python -m pip install --upgrade pip
-          pip install --upgrade pip setuptools wheel
-          pip install --upgrade build
-          pip install -r requirements.txt
+          python -m pip show setuptools
+          python -m pip install pandas==1.5.3 --only-binary=:all:
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade build
+          python -m pip install -r requirements.txt
           python model.py
