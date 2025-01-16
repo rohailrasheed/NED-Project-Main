@@ -20,8 +20,6 @@ jobs:
           # Your ML workflow goes here
           python -m pip install --upgrade pip
           python -m pip show setuptools
-          python -m pip install numpy==1.23.4 --only-binary=:all:
-          python -m pip install pandas==1.5.3 --only-binary=:all:
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install --upgrade build
           python -m pip install -r requirements.txt
