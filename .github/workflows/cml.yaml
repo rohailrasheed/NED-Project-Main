@@ -19,7 +19,7 @@ jobs:
         run: |
           # Your ML workflow goes here
           python -m pip install --upgrade pip
-          pip install --force-reinstall --upgrade pip setuptools wheel
-          pip install --force-reinstall --upgrade build
+          pip install --upgrade pip setuptools wheel
+          pip install --upgrade build
           pip install -r requirements.txt
           python model.py
