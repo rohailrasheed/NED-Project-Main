@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      # Set up Python 3.10 environment
+      # Set up Python 3.10 environment (you can specify a more recent Python version if required)
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
@@ -25,40 +25,30 @@ jobs:
           python -m pip install --upgrade pip setuptools==68.0.0 wheel==0.40.0
           python -m pip install --no-cache-dir -r requirements.txt
 
-      # Install ngrok for tunneling
-      - name: Install ngrok
-        run: |
-          curl -s https://ngrok.com/download | tar xz
-          sudo mv ngrok /usr/local/bin
+      # Optional: Install caching (to speed up subsequent builds)
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       # Running the ML model (replace 'model.py' with your actual script if needed)
       - name: Train model
         run: |
           python model.py
 
-      # Running the Flask Backend File and starting ngrok tunnel
-      - name: Run Flask and Expose with ngrok
+      # Running the Flask Backend File
+      - name: Run Flask App
         run: |
-          # Start Flask app in the background
+          # Run Flask app in the background
           python app.py &
+          sleep 10  # wait for Flask to start
 
-          # Start ngrok and expose Flask app
-          ngrok http 5000 &
-
-          # Give ngrok a moment to establish the tunnel
-          sleep 10
-
-          # Retrieve the ngrok public URL
-          NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)
-
-          # Print the ngrok URL
-          echo "Flask is running at: $NGROK_URL"
-
-          # Optional: Save the ngrok URL to use in the next steps
-          echo "NGROK_URL=$NGROK_URL" >> $GITHUB_ENV
-
-      # Testing your Flask API using ngrok public URL
+      # Optional: Test API communication (replace with your actual endpoint)
       - name: Test API
         run: |
-          curl ${{ secrets.NGROK_URL }}/predict
-          curl ${{ secrets.NGROK_URL }}/compare/Karachi
+          curl http://127.0.0.1:5000  # or use a custom API test script here
+          curl http://127.0.0.1:5000/predict
+          curl http://127.0.0.1:5000/compare/Karachi
