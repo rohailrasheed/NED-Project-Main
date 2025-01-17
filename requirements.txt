@@ -9,5 +9,6 @@ numpy
 scipy
 scikit-image==0.24.0
 flask==3.0.3
+flask_cors
 requests==2.31.0
 pytest==8.3.2
