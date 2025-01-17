@@ -1,6 +1,6 @@
 name: weather-forecast-ml
 
-on: 
+on:
   push:
     branches:
       - main  # or the branches you're pushing to
@@ -40,6 +40,13 @@ jobs:
           python model.py
 
       # Running the Flask Backend File
-      - name: Run Flask
+      - name: Run Flask App
         run: |
-          python app.py
+          # Run Flask app in the background
+          python app.py &
+          sleep 10  # wait for Flask to start
+
+      # Optional: Test API communication (replace with your actual endpoint)
+      - name: Test API
+        run: |
+          curl http://127.0.0.1:5000  # or use a custom API test script here
