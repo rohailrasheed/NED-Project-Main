@@ -73,12 +73,12 @@ jobs:
           mkdir -p zap-reports
           docker run --rm \
             -u zap \
-            -v ${{ github.workspace }}/zap-reports:/zap/reports \
+            -v ${{ github.workspace }}/zap-reports:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t ${{ env.NGROK_URL }} \
-            -J /zap/reports/zap-report.json \
-            -w /zap/reports/zap-report.md \
-            -r /zap/reports/zap-report.html
+            -J zap-report.json \
+            -w zap-report.md \
+            -r zap-report.html
 
       - name: Upload ZAP HTML Report
         uses: actions/upload-artifact@v4
