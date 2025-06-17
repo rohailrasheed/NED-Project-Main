@@ -3,7 +3,7 @@ name: weather-forecast-ml
 on:
   push:
     branches:
-      - main  # or the branches you're pushing to
+      - main
 
 jobs:
   run:
@@ -12,20 +12,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      # Set up Python 3.10 environment (you can specify  more recent Python version if required)
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # Install required dependencies
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip setuptools==68.0.0 wheel==0.40.0
           python -m pip install --no-cache-dir -r requirements.txt
 
-      # Optional: Install caching (to speed up subsequent builds)
       - name: Cache pip dependencies
         uses: actions/cache@v3
         with:
@@ -34,16 +31,42 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # Running the ML model (replace 'model.py' with your actual script if needed)
       - name: Train model
         run: |
           python model.py
 
-      # Running the Flask Backend File
-      - name: Run Flask App
+      - name: Install ngrok
         run: |
-          # Run Flask app in the background
-          python app.py &
-          sleep 10  # wait for Flask to start
-          curl http://127.0.0.1:5000/predict
-          curl http://127.0.0.1:5000/compare/Karachi
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
+
+      - name: Start Flask app and ngrok tunnel
+        run: |
+          nohup python app.py > flask.log 2>&1 &
+          sleep 10  # Wait for Flask to fully start
+
+          # Start ngrok in background
+          ngrok http 5000 > ngrok.log &
+          sleep 10  # Wait for ngrok to initialize
+
+      - name: Get public URL from ngrok
+        id: get-ngrok-url
+        run: |
+          echo "Fetching ngrok public URL..."
+          NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
+          echo "NGROK_URL=$NGROK_URL" >> $GITHUB_ENV
+          echo "Public URL is: $NGROK_URL"
+
+      - name: Test Flask API Endpoints
+        run: |
+          echo "Calling ${{ env.NGROK_URL }}/predict"
+          curl -i ${{ env.NGROK_URL }}/predict
+
+          echo "Calling ${{ env.NGROK_URL }}/compare/Karachi"
+          curl -i ${{ env.NGROK_URL }}/compare/Karachi
+
+      - name: ZAP Scan on exposed URL
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: ${{ env.NGROK_URL }}
