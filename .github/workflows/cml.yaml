@@ -75,6 +75,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ env.NGROK_URL }}
           allow_issue_writing: false
+          upload_artifact: false   # ✅ prevent automatic invalid 'zap_scan' artifact
           cmd_options: >
             -J report_json.json
             -w report_md.md
@@ -97,4 +98,3 @@ jobs:
         with:
           name: zap-report-json
           path: report_json.json
-
