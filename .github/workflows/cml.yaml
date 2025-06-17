@@ -44,14 +44,10 @@ jobs:
       - name: Start Flask app and ngrok tunnel
         run: |
           nohup python app.py > flask.log 2>&1 &
-          sleep 10  # Wait for Flask to fully start
-
-          # Add ngrok authtoken from GitHub secrets
+          sleep 10
           ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
-
-          # Start ngrok tunnel
           ngrok http 5000 > ngrok.log &
-          sleep 10  # Wait for ngrok to initialize
+          sleep 10
 
       - name: Get public URL from ngrok
         id: get-ngrok-url
@@ -65,11 +61,28 @@ jobs:
         run: |
           echo "Calling ${{ env.NGROK_URL }}/predict"
           curl -i ${{ env.NGROK_URL }}/predict
-
           echo "Calling ${{ env.NGROK_URL }}/compare/Karachi"
           curl -i ${{ env.NGROK_URL }}/compare/Karachi
+
+      - name: Create ZAP report files
+        run: |
+          touch report_json.json report_md.md report_html.html
+          chmod a+w report_json.json report_md.md report_html.html
 
       - name: ZAP Scan on exposed URL
         uses: zaproxy/action-baseline@v0.10.0
         with:
           target: ${{ env.NGROK_URL }}
+          cmd_options: >
+            -J report_json.json
+            -w report_md.md
+            -r report_html.html
+
+      - name: Upload ZAP scan report artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-scan-report
+          path: |
+            report_json.json
+            report_md.md
+            report_html.html
