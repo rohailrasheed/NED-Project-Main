@@ -72,19 +72,29 @@ jobs:
       - name: ZAP Scan on exposed URL
         uses: zaproxy/action-baseline@v0.10.0
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ env.NGROK_URL }}
           allow_issue_writing: false
-          upload_artifact: false
           cmd_options: >
             -J report_json.json
             -w report_md.md
             -r report_html.html
 
-      - name: Upload ZAP Reports
+      - name: Upload ZAP HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-scan
-          path: |
-            report_json.json
-            report_md.md
-            report_html.html
+          name: zap-report-html
+          path: report_html.html
+
+      - name: Upload ZAP Markdown Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-md
+          path: report_md.md
+
+      - name: Upload ZAP JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-json
+          path: report_json.json
+
