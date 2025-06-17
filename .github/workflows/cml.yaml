@@ -79,7 +79,8 @@ jobs:
             -J zap-report.json \
             -w zap-report.md \
             -r zap-report.html \
-            --exitcodeignorewarns
+            -I
+
 
 
       - name: Upload ZAP HTML Report
