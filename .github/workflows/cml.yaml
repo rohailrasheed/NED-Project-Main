@@ -46,7 +46,10 @@ jobs:
           nohup python app.py > flask.log 2>&1 &
           sleep 10  # Wait for Flask to fully start
 
-          # Start ngrok in background
+          # Add ngrok authtoken from GitHub secrets
+          ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+
+          # Start ngrok tunnel
           ngrok http 5000 > ngrok.log &
           sleep 10  # Wait for ngrok to initialize
 
