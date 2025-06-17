@@ -73,6 +73,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.10.0
         with:
           target: ${{ env.NGROK_URL }}
+          allow_issue_writing: false
           cmd_options: >
             -J report_json.json
             -w report_md.md
