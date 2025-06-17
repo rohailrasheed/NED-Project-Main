@@ -77,12 +77,4 @@ jobs:
             -J report_json.json
             -w report_md.md
             -r report_html.html
-
-      - name: Upload ZAP scan report artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-scan_report
-          path: |
-            report_json.json
-            report_md.md
-            report_html.html
+  
