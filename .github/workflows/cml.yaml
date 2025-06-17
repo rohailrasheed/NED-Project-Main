@@ -73,6 +73,7 @@ jobs:
           docker run --rm \
             -u $(id -u):$(id -g) \
             -e HOME=/zap/wrk \
+            -w /zap/wrk \
             -v $(pwd):/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t ${{ env.NGROK_URL }} \
