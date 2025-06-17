@@ -64,21 +64,12 @@ jobs:
           echo "Calling ${{ env.NGROK_URL }}/compare/Karachi"
           curl -i ${{ env.NGROK_URL }}/compare/Karachi
 
-      - name: Create ZAP report files
+      - name: Run ZAP Baseline Scan (manual via Docker)
         run: |
-          touch report_json.json report_md.md report_html.html
-          chmod a+w report_json.json report_md.md report_html.html
-
-      - name: ZAP Scan on exposed URL
-        uses: zaproxy/action-baseline@v0.10.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ env.NGROK_URL }}
-          allow_issue_writing: false
-          upload_artifact: false   # ✅ prevent automatic invalid 'zap_scan' artifact
-          cmd_options: >
-            -J report_json.json
-            -w report_md.md
+          docker run --rm -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zap-stable zap-baseline.py \
+            -t ${{ env.NGROK_URL }} \
+            -J report_json.json \
+            -w report_md.md \
             -r report_html.html
 
       - name: Upload ZAP HTML Report
