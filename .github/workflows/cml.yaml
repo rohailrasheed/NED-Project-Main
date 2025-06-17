@@ -70,11 +70,15 @@ jobs:
 
       - name: Run ZAP Baseline Scan (manual via Docker)
         run: |
-          docker run --rm -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+          docker run --rm \
+            -u $(id -u):$(id -g) \
+            -v $(pwd):/zap/wrk/:rw \
+            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t ${{ env.NGROK_URL }} \
             -J report_json.json \
             -w report_md.md \
             -r report_html.html
+
 
       - name: Upload ZAP HTML Report
         uses: actions/upload-artifact@v4
