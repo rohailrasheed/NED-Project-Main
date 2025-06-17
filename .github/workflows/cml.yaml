@@ -64,9 +64,13 @@ jobs:
           echo "Calling ${{ env.NGROK_URL }}/compare/Karachi"
           curl -i ${{ env.NGROK_URL }}/compare/Karachi
 
+      - name: Pull working ZAP Docker image
+        run: |
+          docker pull ghcr.io/zaproxy/zaproxy:stable
+
       - name: Run ZAP Baseline Scan (manual via Docker)
         run: |
-          docker run --rm -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py \
+          docker run --rm -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t ${{ env.NGROK_URL }} \
             -J report_json.json \
             -w report_md.md \
