@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p zap-reports
           docker run --rm \
-            -u zap \
+            -u root \
             -v ${{ github.workspace }}/zap-reports:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t ${{ env.NGROK_URL }} \
